@@ -21,7 +21,10 @@ Home Assistant integration for **Alfen Eve NG9xx** series EV chargers via Modbus
 ## Requirements
 
 - Home Assistant **2024.4.0** or newer
-- Alfen Eve NG9xx charger with **Active Load Balancing** license
+- Alfen Eve NG9xx charger with:
+  - Firmware **4.2.0** or newer (Modbus TCP support)
+  - Firmware **6.4.0+** recommended (fixes power budget reset bug)
+  - **Active Load Balancing** license enabled
 - Modbus TCP enabled on the charger
 
 ## Installation
