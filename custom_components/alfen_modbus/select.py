@@ -9,10 +9,7 @@ from .const import (
 )
 
 from homeassistant.const import CONF_NAME
-from homeassistant.components.select import (
-    PLATFORM_SCHEMA,
-    SelectEntity,
-)
+from homeassistant.components.select import SelectEntity
 
 from homeassistant.core import callback
 
@@ -26,6 +23,8 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
         "identifiers": {(DOMAIN, hub_name)},
         "name": hub_name,
         "manufacturer": ATTR_MANUFACTURER,
+        "model": hub.data.get("platformType", "Unknown"),
+        "sw_version": hub.data.get("firmwareVersion", "Unknown"),
     }
 
     entities = []
@@ -127,7 +126,7 @@ class AlfenSelect(SelectEntity):
         """Change the selected option."""
         new_mode = get_key(self._option_dict, option)
         payload = self._hub._client.convert_to_registers(int(new_mode), data_type=self._hub._client.DATATYPE.UINT16, word_order="big")                   
-        self._hub.write_registers(unit=self._socket, address=self._register, payload=payload)       
+        await self._hub.write_registers(unit=self._socket, address=self._register, payload=payload)       
         self._hub.data[self._key] = option
         self.async_write_ha_state()
 

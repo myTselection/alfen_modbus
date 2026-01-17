@@ -1,7 +1,9 @@
 import ipaddress
+import logging
 import re
 
 import voluptuous as vol
+from pymodbus.client import ModbusTcpClient
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME, CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
@@ -19,6 +21,8 @@ from .const import (
 )
 from homeassistant.core import HomeAssistant, callback
 
+_LOGGER = logging.getLogger(__name__)
+
 DATA_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
@@ -35,11 +39,26 @@ DATA_SCHEMA = vol.Schema(
 def host_valid(host):
     """Return True if hostname or IP address is valid."""
     try:
-        if ipaddress.ip_address(host).version == (4 or 6):
+        if ipaddress.ip_address(host).version in (4, 6):
             return True
     except ValueError:
         disallowed = re.compile(r"[^a-zA-Z\d\-]")
         return all(x and not disallowed.search(x) for x in host.split("."))
+
+
+async def async_test_connection(hass: HomeAssistant, host: str, port: int) -> bool:
+    """Test if we can connect to the Modbus device."""
+    try:
+        client = ModbusTcpClient(host=host, port=port)
+        # Run connection test in executor to avoid blocking
+        result = await hass.async_add_executor_job(client.connect)
+        if result:
+            await hass.async_add_executor_job(client.close)
+            return True
+        return False
+    except Exception as e:
+        _LOGGER.debug("Connection test failed: %s", e)
+        return False
 
 
 @callback
@@ -68,11 +87,14 @@ class AlfenModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             host = user_input[CONF_HOST]
+            port = user_input[CONF_PORT]
 
             if self._host_in_configuration_exists(host):
                 errors[CONF_HOST] = "already_configured"
             elif not host_valid(user_input[CONF_HOST]):
-                errors[CONF_HOST] = "invalid host IP"
+                errors[CONF_HOST] = "invalid_host"
+            elif not await async_test_connection(self.hass, host, port):
+                errors["base"] = "cannot_connect"
             else:
                 await self.async_set_unique_id(user_input[CONF_HOST])
                 self._abort_if_unique_id_configured()
@@ -83,4 +105,3 @@ class AlfenModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
-

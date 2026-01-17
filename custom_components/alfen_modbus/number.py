@@ -8,10 +8,7 @@ from .const import (
 )
 
 from homeassistant.const import CONF_NAME
-from homeassistant.components.number import (
-    PLATFORM_SCHEMA,
-    NumberEntity,
-)
+from homeassistant.components.number import NumberEntity
 
 from homeassistant.core import callback
 
@@ -25,6 +22,8 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
         "identifiers": {(DOMAIN, hub_name)},
         "name": hub_name,
         "manufacturer": ATTR_MANUFACTURER,
+        "model": hub.data.get("platformType", "Unknown"),
+        "sw_version": hub.data.get("firmwareVersion", "Unknown"),
     }
 
     entities = []
@@ -124,7 +123,10 @@ class AlfenNumber(NumberEntity):
         if self._key in self._hub.data:
             return self._hub.data[self._key]
 
-    def update_value(self):
+    async def update_value(self):
+        if self._key not in self._hub.data:
+            _LOGGER.debug("Key %s not in hub data, skipping update_value", self._key)
+            return
         value = self._hub.data[self._key]
         if "MAX_CURRENT_S"+str(self._socket) in self._hub.data:
             self._attr_native_max_value = self._hub.data["MAX_CURRENT_S"+str(self._socket)]
@@ -135,11 +137,11 @@ class AlfenNumber(NumberEntity):
         elif self._fmt == "f":
             payload = self._hub._client.convert_to_registers(float(value), data_type=self._hub._client.DATATYPE.FLOAT32, word_order="big")
 
-        self._hub.write_registers(unit=self._socket, address=self._register, payload=payload)
+        await self._hub.write_registers(unit=self._socket, address=self._register, payload=payload)
 
 
     async def async_set_native_value(self, value: float) -> None:
         """Change the selected value."""
         self._hub.data[self._key] = value
-        self.update_value()       
+        await self.update_value()       
         self.async_write_ha_state()
