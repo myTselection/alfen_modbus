@@ -11,6 +11,7 @@ After reboot of Home-Assistant, this integration can be configured through the i
 # Enabling Modbus TCP on Alfen EV Charger
 1. Ensure you have aquired the "Active load balancing" license which enables modbus communication for your EV charger. 
 2. Enable "Active Load Balacing" via the Alfen Service installer application. 
+See [Smart charging manual][1]
 
 # Configure power budget (Slave role)
 Select the "Energy Management System" option in the Active balancing -> Data source field. 
@@ -25,6 +26,6 @@ SCN is used in a multi charging station situation (parking lots). The SCN fields
 - Persist the set power budget value across HA restarts
 - Update the power budget value before the Alfen charger timer value expires and the charger drops into safe current mode
 
-[1]: https://alfen.com/file-download/download/public/1610
+[1]: https://knowledge.alfen.com/space/IN/639762449/How+do+I+configure+the+Smart+Charging+functionalities+such+as+Active+Load+Balancing+and+Smart+Charging+Network%3F
 [2]: https://knowledge.alfen.com/space/IN/243466257/Release+notes+-+Firmware+updates+NG-Platform
 
