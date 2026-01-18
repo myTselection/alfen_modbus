@@ -297,6 +297,20 @@ async def test_socket_status_data(client, socket_id, result):
     result.check_range("Max Current", max_current, 0, 64)
     result.check_range("Safe Current", safe_current, 0, 64)
     result.check("Charge Phases is 1 or 3", charge_phases in [1, 3])
+    
+    # Binary sensor logic (derived from mode3_state - matches __init__.py lines 427-438)
+    car_connected = 0 if mode3_state in ["A", "E", "F"] else 1
+    car_charging = 1 if mode3_state in ["C2", "D2"] else 0
+    
+    log.info(f"  --- Binary Sensor Derivation ---")
+    log.info(f"  Car Connected: {car_connected} (derived from mode3_state='{mode3_state}')")
+    log.info(f"  Car Charging: {car_charging} (derived from mode3_state='{mode3_state}')")
+    
+    result.check("Car Connected is 0 or 1", car_connected in [0, 1])
+    result.check("Car Charging is 0 or 1", car_charging in [0, 1])
+    # If car is charging, it must also be connected
+    if car_charging == 1:
+        result.check("Charging implies connected", car_connected == 1)
 
 
 async def test_write_max_current(client, socket_id, result):

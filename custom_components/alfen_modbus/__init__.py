@@ -52,7 +52,7 @@ CONFIG_SCHEMA = vol.Schema(
     {DOMAIN: vol.Schema({cv.slug: ALFEN_MODBUS_SCHEMA})}, extra=vol.ALLOW_EXTRA
 )
 
-PLATFORMS = ["number", "select", "sensor"]
+PLATFORMS = ["binary_sensor", "number", "select", "sensor"]
 
 
 async def async_setup(hass, config):
