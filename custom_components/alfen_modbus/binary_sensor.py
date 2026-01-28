@@ -110,7 +110,7 @@ class AlfenBinarySensor(BinarySensorEntity):
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._platform_name} ({self._name})"
+        return f"{self._platform_name} {self._name}"
 
     @property
     def unique_id(self) -> Optional[str]:
