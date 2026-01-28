@@ -128,8 +128,14 @@ class AlfenNumber(NumberEntity):
             _LOGGER.debug("Key %s not in hub data, skipping update_value", self._key)
             return
         value = self._hub.data[self._key]
-        if "MAX_CURRENT_S"+str(self._socket) in self._hub.data:
+        
+        # Use actualMaxCurrent (Register 1100) as the hard limit for the slider
+        if "actualMaxCurrent" in self._hub.data:
+            self._attr_native_max_value = self._hub.data["actualMaxCurrent"]
+        elif "MAX_CURRENT_S"+str(self._socket) in self._hub.data:
+             # Fallback to previous logic if actualMaxCurrent not available
             self._attr_native_max_value = self._hub.data["MAX_CURRENT_S"+str(self._socket)]
+            
         _LOGGER.debug("Updating value to: %f",value)
 
         if self._fmt == "u":
@@ -142,6 +148,13 @@ class AlfenNumber(NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Change the selected value."""
+        # Clamp value to actualMaxCurrent if available
+        if "actualMaxCurrent" in self._hub.data:
+            max_allowed = self._hub.data["actualMaxCurrent"]
+            if value > max_allowed:
+                _LOGGER.warning("Requested value %s exceeds max current %s, clamping.", value, max_allowed)
+                value = max_allowed
+
         self._hub.data[self._key] = value
         await self.update_value()       
         self.async_write_ha_state()
