@@ -80,6 +80,7 @@ See the [Alfen Smart Charging Manual](https://knowledge.alfen.com/space/IN/63976
 ## Known Issues
 
 - Power budget may reset to 0A when no car is connected (fixed in firmware [6.4.0-4210](https://knowledge.alfen.com/space/IN/243466257))
+- **Reallin power meter (post-2021)**: Chargers with a Reallin power meter produced after 2021 only export a subset of measurement values. Per-phase energy, apparent energy, and reactive energy sensors will show as "unavailable" (NaN). This is a hardware limitation, not a bug.
 
 ## Contributing
 

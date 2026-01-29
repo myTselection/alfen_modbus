@@ -241,7 +241,7 @@ def setup_socket_context(socket_id):
     block.setValues(reg(370), encode_double(15312.89))  # E L3
     block.setValues(reg(374), encode_double(45745.98))  # E Sum
     
-    # Real Energy Consumed (float64, Wh) - offset 78, 82, 86, 88
+    # Real Energy Consumed (float64, Wh) - offset 78, 82, 86, 90
     block.setValues(reg(378), encode_double(0.0))
     block.setValues(reg(382), encode_double(0.0))
     block.setValues(reg(386), encode_double(0.0))
@@ -253,10 +253,11 @@ def setup_socket_context(socket_id):
     block.setValues(reg(400), encode_double(15612.0))
     block.setValues(reg(404), encode_double(46639.0))
     
-    # Reactive Energy (float64, VArh) - offset 108, 112, 116
+    # Reactive Energy (float64, VArh) - offset 108, 112, 116, 120
     block.setValues(reg(408), encode_double(3024.0))
     block.setValues(reg(412), encode_double(3189.0))
     block.setValues(reg(416), encode_double(2956.0))
+    block.setValues(reg(420), encode_double(9169.0))  # Reactive Energy Sum
     
     # === Socket Status/Control (Registers 1200-1215) ===
     # HA reads registers 1200-1215 (16 registers)
