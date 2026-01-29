@@ -86,6 +86,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Register the hub."""
     hass.data[DOMAIN][name] = {"hub": hub}
 
+    # Read device info before setting up platforms so device_info is available
+    hub.connect()
+    await hub.read_modbus_data()
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
@@ -399,7 +403,7 @@ class AlfenModbusHub:
             self.data["socket_"+str(socket)+"_realEnergyConsumedL1"] =  round(self.decode_from_registers(energy_data.registers,78,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_realEnergyConsumedL2"] =   round(self.decode_from_registers(energy_data.registers,82,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_realEnergyConsumedL3"] =  round(self.decode_from_registers(energy_data.registers,86,4,self._client.DATATYPE.FLOAT64),2) 
-            self.data["socket_"+str(socket)+"_realEnergyConsumedSum"] =   round(self.decode_from_registers(energy_data.registers,88,4,self._client.DATATYPE.FLOAT64),2)     
+            self.data["socket_"+str(socket)+"_realEnergyConsumedSum"] =   round(self.decode_from_registers(energy_data.registers,90,4,self._client.DATATYPE.FLOAT64),2)     
             self.data["socket_"+str(socket)+"_apparantEnergyL1"] =  round(self.decode_from_registers(energy_data.registers,92,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_apparantEnergyL2"] =   round(self.decode_from_registers(energy_data.registers,96,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_apparantEnergyL3"] =  round(self.decode_from_registers(energy_data.registers,100,4,self._client.DATATYPE.FLOAT64),2) 
@@ -408,7 +412,7 @@ class AlfenModbusHub:
             self.data["socket_"+str(socket)+"_reactiveEnergyL1"] =   round(self.decode_from_registers(energy_data.registers,108,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_reactiveEnergyL2"] =   round(self.decode_from_registers(energy_data.registers,112,4,self._client.DATATYPE.FLOAT64),2) 
             self.data["socket_"+str(socket)+"_reactiveEnergyL3"] =  round(self.decode_from_registers(energy_data.registers,116,4,self._client.DATATYPE.FLOAT64),2) 
-            self.data["socket_"+str(socket)+"_reactiveEnergySum"] = 0# round(decoder.decode_64bit_float(),2)        
+            self.data["socket_"+str(socket)+"_reactiveEnergySum"] = round(self.decode_from_registers(energy_data.registers,120,4,self._client.DATATYPE.FLOAT64),2)        
                                             
                             
             status_data = await self.read_holding_registers(socket,1200,16)
