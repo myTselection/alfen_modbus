@@ -88,6 +88,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Changelog
 
+### v1.0.0
+
+- **Stable release** - First stable release for HACS
+- **Binary sensors** - Added `car_connected` and `car_charging` binary sensors
+- **Improved config flow** - Enhanced UI with descriptions and connection testing
+- **Options flow** - Reconfigure host, port, and settings after setup
+- **pymodbus 3.11 compatibility** - Updated API calls for latest pymodbus
+
 ### v0.2.0
 
 - **Max current protection** - The max current slider now dynamically limits to the station's actual max current (Register 1100), preventing values higher than the hardware allows
