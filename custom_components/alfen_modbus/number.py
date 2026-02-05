@@ -155,6 +155,7 @@ class AlfenNumber(NumberEntity):
 
         self._hub.data[self._key] = value
         await self.update_value()       
+        self.hass.async_create_task(self._hub.async_refresh_modbus_data())
         self.async_write_ha_state()
 
     @property

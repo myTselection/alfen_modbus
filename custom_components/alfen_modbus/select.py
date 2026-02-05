@@ -126,6 +126,7 @@ class AlfenSelect(SelectEntity):
         payload = self._hub._client.convert_to_registers(int(new_mode), data_type=self._hub._client.DATATYPE.UINT16, word_order="big")                   
         await self._hub.write_registers(unit=self._socket, address=self._register, payload=payload)       
         self._hub.data[self._key] = option
+        self.hass.async_create_task(self._hub.async_refresh_modbus_data())
         self.async_write_ha_state()
 
     @property
